@@ -90,7 +90,8 @@ static inline void hb_init() {
     float min_heartrate;
     float max_heartrate;
     int window_size;
-    char* logfile;
+    char logfile[100];
+    memset(logfile, 0, sizeof(logfile));
 
     if(getenv(PREFIX"_MIN_HEART_RATE") == NULL) {
       min_heartrate = 0.0;
@@ -108,9 +109,9 @@ static inline void hb_init() {
       window_size = atoi(getenv(PREFIX"_WINDOW_SIZE"));
     }
     if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
-      logfile = "heartbeat.log";
+      strcpy(logfile, "heartbeat.log");
     } else {
-      logfile = getenv(PREFIX"_WINDOW_SIZE");
+      strcpy(logfile, getenv(PREFIX"_WINDOW_SIZE"));
     }
 
     printf("init heartbeat with %f %f %d\n", min_heartrate, max_heartrate, window_size);
