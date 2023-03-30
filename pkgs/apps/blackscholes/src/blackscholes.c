@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifdef ENABLE_PARSEC_HOOKS
 #include <hooks.h>
@@ -124,6 +125,7 @@ static inline void hb_init() {
 }
 
 static inline void hb_finish() {
+    sleep(20);
     heartbeat_finish(heart);
     printf("heartbeat finished\n");
 }
