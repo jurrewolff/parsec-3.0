@@ -16,19 +16,14 @@
 #include <hooks.h>
 #endif
 
-#define HB_ENERGY_IMPL
-#include <heartbeats/hb-energy.h>
-#include <heartbeats/heartbeat-accuracy-power.h>
-#include <poet/poet.h>
-#include <poet/poet_config.h>
+#include <heartbeats/heartbeat.h>
+#include <heartbeats/heartbeat-types.h>
+#include <heartbeats/heart_rate_monitor.h>
 
 #define PREFIX "BLACKSCHOLES"
-#define USE_POET // Power and performance control
 
 heartbeat_t* heart;
-poet_state* state;
-static poet_control_state_t* control_states;
-static poet_cpu_state_t* cpu_states;
+heart_rate_monitor_t hrm;
 
 // Multi-threaded pthreads header
 #ifdef ENABLE_THREADS
@@ -91,12 +86,11 @@ fptype * otime;
 int numError = 0;
 int nThreads;
 
-static inline void hb_poet_init() {
+static inline void hb_init() {
     float min_heartrate;
     float max_heartrate;
     int window_size;
-    double power_target;
-    unsigned int nstates;
+    char* logfile;
 
     if(getenv(PREFIX"_MIN_HEART_RATE") == NULL) {
       min_heartrate = 0.0;
@@ -113,46 +107,22 @@ static inline void hb_poet_init() {
     } else {
       window_size = atoi(getenv(PREFIX"_WINDOW_SIZE"));
     }
-    if(getenv(PREFIX"_POWER_TARGET") == NULL) {
-      power_target = 70;
+    if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
+      logfile = "heartbeat.log";
     } else {
-      power_target = atof(getenv(PREFIX"_POWER_TARGET"));
+      logfile = getenv(PREFIX"_WINDOW_SIZE");
     }
 
     printf("init heartbeat with %f %f %d\n", min_heartrate, max_heartrate, window_size);
-    heart = heartbeat_acc_pow_init(window_size, 100, "heartbeat.log",
-                                   min_heartrate, max_heartrate,
-                                   0, 100,
-                                   1, hb_energy_impl_alloc(), power_target, power_target);
+    heart = heartbeat_init(window_size, 100, logfile, min_heartrate, max_heartrate);
     if (heart == NULL) {
       fprintf(stderr, "Failed to init heartbeat.\n");
       exit(1);
     }
-#ifdef USE_POET
-    if (get_control_states(NULL, &control_states, &nstates)) {
-      fprintf(stderr, "Failed to load control states.\n");
-      exit(1);
-    }
-    if (get_cpu_states(NULL, &cpu_states, &nstates)) {
-      fprintf(stderr, "Failed to load cpu states.\n");
-      exit(1);
-    }
-    state = poet_init(heart, nstates, control_states, cpu_states, &apply_cpu_config, &get_current_cpu_state, 1, "poet.log");
-    if (state == NULL) {
-      fprintf(stderr, "Failed to init poet.\n");
-      exit(1);
-    }
-#endif
    printf("heartbeat init'd\n");
-
 }
 
-static inline void hb_poet_finish() {
-#ifdef USE_POET
-    poet_destroy(state);
-    free(control_states);
-    free(cpu_states);
-#endif
+static inline void hb_finish() {
     heartbeat_finish(heart);
     printf("heartbeat finished\n");
 }
@@ -401,7 +371,7 @@ int main (int argc, char **argv)
     int * buffer2;
     int rv;
 
-    hb_poet_init();
+    hb_init();
 
 #ifdef PARSEC_VERSION
 #define __PARSEC_STRING(x) #x
@@ -519,10 +489,7 @@ int main (int argc, char **argv)
     int j;
     for (j=0; j<NUM_RUNS; j++) {
         if(j > 10) {
-          heartbeat_acc(heart, j, 1);
-#ifdef USE_POET
-          poet_apply_control(state);
-#endif
+          heartbeat(heart, j);
         }
 
         // handle the pthreads ourselves to work around bug --CKI 2014-10-07
@@ -600,7 +567,7 @@ int main (int argc, char **argv)
     __parsec_bench_end();
 #endif
 
-    hb_poet_finish();
+    hb_finish();
 
     return 0;
 }
