@@ -115,7 +115,7 @@ static inline void hb_init() {
       strcpy(logfile, getenv(PREFIX"_WINDOW_SIZE"));
     }
 
-    printf("init heartbeat with %f %f %d\n", min_heartrate, max_heartrate, window_size);
+    printf("init heartbeat with %f %f %d %s\n", min_heartrate, max_heartrate, window_size, logfile);
     heart = heartbeat_init(window_size, 100, logfile, min_heartrate, max_heartrate);
     if (heart == NULL) {
       fprintf(stderr, "Failed to init heartbeat.\n");
