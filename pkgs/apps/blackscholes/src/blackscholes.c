@@ -110,7 +110,9 @@ static inline void hb_init() {
       window_size = atoi(getenv(PREFIX"_WINDOW_SIZE"));
     }
     if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
-      strcpy(logfile, "heartbeat.log");
+      // strcpy(logfile, "heartbeat.log");
+      // TODO - Remove hardcoding
+      strcpy(logfile, "/var/log/heartbeat.log");
     } else {
       strcpy(logfile, getenv(PREFIX"_HB_LOGFILE_PATH"));
     }
