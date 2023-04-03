@@ -112,7 +112,7 @@ static inline void hb_init() {
     if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
       // strcpy(logfile, "heartbeat.log");
       // TODO - Remove hardcoding
-      strcpy(logfile, "/var/log/heartbeat.log");
+      strcpy(logfile, "/var/log/heartbeat/heartbeat.log");
     } else {
       strcpy(logfile, getenv(PREFIX"_HB_LOGFILE_PATH"));
     }
