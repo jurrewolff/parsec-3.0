@@ -112,7 +112,7 @@ static inline void hb_init() {
     if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
       strcpy(logfile, "heartbeat.log");
     } else {
-      strcpy(logfile, getenv(PREFIX"_WINDOW_SIZE"));
+      strcpy(logfile, getenv(PREFIX"_HB_LOGFILE_PATH"));
     }
 
     printf("init heartbeat with %f %f %d %s\n", min_heartrate, max_heartrate, window_size, logfile);
@@ -125,7 +125,6 @@ static inline void hb_init() {
 }
 
 static inline void hb_finish() {
-    sleep(20);
     heartbeat_finish(heart);
     printf("heartbeat finished\n");
 }
