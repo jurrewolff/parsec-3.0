@@ -59,7 +59,7 @@ using namespace tbb;
 //Precision to use for calculations
 #define fptype float
 
-#define NUM_RUNS 400
+#define NUM_RUNS 500
 
 typedef struct OptionData_ {
         fptype s;          // spot price
@@ -492,7 +492,7 @@ int main (int argc, char **argv)
 #else
     int j;
     for (j=0; j<NUM_RUNS; j++) {
-        if(j > 10) {
+        if(j > 10) { // TODO - Why skip logging hb first 10 runs?
           heartbeat(heart, j);
         }
 
