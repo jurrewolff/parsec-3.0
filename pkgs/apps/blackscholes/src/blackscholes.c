@@ -121,10 +121,11 @@ static inline void hb_init() {
 
       sprintf(pid_str, "%d", getpid());
       strcpy(logfile, strcat(logdir_path, pid_str));
+      strcat(logfile, ".log");
     }
 
-    printf("init heartbeat with %f %f %d %s\n", min_heartrate, max_heartrate, window_size, logfile);
-    heart = heartbeat_init(window_size, 100, logfile, min_heartrate, max_heartrate);
+    printf("init heartbeat with %f %f %d %s\n", min_heartrate, max_heartrate, window_size, (logfile[0] == '\0') ? NULL : logfile);
+    heart = heartbeat_init(window_size, 100, (logfile[0] == '\0') ? NULL : logfile, min_heartrate, max_heartrate);
     if (heart == NULL) {
       fprintf(stderr, "Failed to init heartbeat.\n");
       exit(1);
