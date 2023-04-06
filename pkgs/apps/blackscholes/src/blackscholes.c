@@ -59,7 +59,7 @@ using namespace tbb;
 //Precision to use for calculations
 #define fptype float
 
-#define NUM_RUNS 500
+#define NUM_RUNS 100
 
 typedef struct OptionData_ {
         fptype s;          // spot price
@@ -91,7 +91,7 @@ static inline void hb_init() {
     float min_heartrate;
     float max_heartrate;
     int window_size;
-    char logfile[100];
+    char logfile[512];
     memset(logfile, 0, sizeof(logfile));
 
     if(getenv(PREFIX"_MIN_HEART_RATE") == NULL) {
@@ -492,7 +492,7 @@ int main (int argc, char **argv)
 #else
     int j;
     for (j=0; j<NUM_RUNS; j++) {
-        if(j > 10) { // TODO - Why skip logging hb first 10 runs?
+        if(j > 10) { // TODO - Why skip logging hb first 10 runs? Cache warming?
           heartbeat(heart, j);
         }
 
