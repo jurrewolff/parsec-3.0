@@ -91,7 +91,11 @@ static inline void hb_init() {
     float min_heartrate;
     float max_heartrate;
     int window_size;
+    char pid_str[32];
+    char logdir_path[512];
     char logfile[512];
+    memset(pid_str, 0, sizeof(pid_str));
+    memset(logdir_path, 0, sizeof(logdir_path));
     memset(logfile, 0, sizeof(logfile));
 
     if(getenv(PREFIX"_MIN_HEART_RATE") == NULL) {
@@ -109,12 +113,14 @@ static inline void hb_init() {
     } else {
       window_size = atoi(getenv(PREFIX"_WINDOW_SIZE"));
     }
-    if(getenv(PREFIX"_HB_LOGFILE_PATH") == NULL) {
-      // strcpy(logfile, "heartbeat.log");
-      // TODO - Remove hardcoding
-      strcpy(logfile, "/var/log/heartbeat/heartbeat.log");
-    } else {
-      strcpy(logfile, getenv(PREFIX"_HB_LOGFILE_PATH"));
+    if(getenv(PREFIX"_HB_LOGFILE_DIR") != NULL) {
+      strcpy(logdir_path, getenv(PREFIX"_HB_LOGFILE_DIR"));
+      if (strlen(logdir_path) > 0 && logdir_path[strlen(logdir_path)-1] != '/') {
+        strcat(logdir_path, "/");
+      }
+
+      sprintf(pid_str, "%d", getpid());
+      strcpy(logfile, strcat(logdir_path, pid_str));
     }
 
     printf("init heartbeat with %f %f %d %s\n", min_heartrate, max_heartrate, window_size, logfile);
